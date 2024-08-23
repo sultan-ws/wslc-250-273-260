@@ -15,5 +15,27 @@ const data = `<!DOCTYPE html>
                 </body>
             </html>`;
 
-            // create file
-            fs.writeFileSync(`${filePath}/test.txt`, 'hello everyone');
+// create file
+// fs.writeFileSync(`${filePath}/test.txt`, 'hello everyone');
+
+
+//if file exist
+// console.log(fs.existsSync(`${filePath}/test.txt`));
+
+// fs.readFile(`${filePath}/index.html`, 'utf-8', (error, file)=>{
+//     if(error) return console.log(error);
+//     console.log(file);
+// })
+
+// update file/
+
+// fs.appendFile(`${filePath}/test.txt`, ' now updated', (error)=>{
+//     if(error) return console.log(error);
+//     console.log('file updated successfully');
+// })
+
+// delete file 
+
+if(fs.existsSync(`${filePath}/test.txt`)){
+fs.unlinkSync(`${filePath}/test.txt`);
+}
