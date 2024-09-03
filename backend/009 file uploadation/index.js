@@ -2,10 +2,27 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const mongodb = require('mongodb');
+
+const url = 'mongodb://localhost:27017';
+const dbname = 'temp_users_data';
+
+const client = new mongodb.MongoClient(url);
+
+const config = async()=>{
+    await client.connect();
+
+    const db = client.db(dbname);
+
+
+    return db;
+};
 
 const app = express();
 
 app.use(express.json());
+
+app.use('/api-services', express.static('uploads'));
 
 const multerStorage = multer.diskStorage({
     destination:(req, file, cb)=>{
@@ -18,29 +35,92 @@ const multerStorage = multer.diskStorage({
     }
 });
 
-const upload = multer({storage:multerStorage}).single('image');
+//*** single field with single file */
+// const upload = multer({storage:multerStorage}).single('image');
 
-app.post('/insert-data',upload, (req,res)=>{
+//*** single field with multiple file */
+// const upload = multer({storage:multerStorage}).array('images', 10);
+
+
+//*** multiple fields */
+const upload = multer({storage:multerStorage}).fields(
+    [
+        { name: 'images', maxCount: 10 },
+        { name: 'thumbnail', maxCount: 1 },
+        
+    ]
+);
+
+app.post('/insert-data',upload, async(req,res)=>{
+
+    const db = await config();
+    const users = db.collection('users');
+
     try{
         const data = req.body;
+        const files = req.files;
 
-        console.log(req.file);
+        // console.log(req.file);  if single file to be uploaded
+        //console.log(req.files);  //multiple files to be uploaded
 
-        if(req.file){
+        if(req.files){
+            data.thumbnail = req.files.thumbnail[0].filename;
 
-            if(path.extname(req.file.filename) === '.jpeg' || path.extname(req.file.filename) === '.jpg'){
-                data.image = req.file.filename
-            }
-            else{
-                res.status(400).json({message:'Invalid file type'});
-
-                fs.unlinkSync(path.join(__dirname, `uploads/${req.file.filename}`));
-                return;
-            }
-            
+            data.images = req.files.images.map((image)=>(image.filename));
         }
-        console.log(data);
-        res.status(200).json({message: 'data added successfully'});
+
+
+
+        const response = await users.insertOne(data);
+
+        res.status(200).json({message: 'data added successfully', data: response});
+
+        // if(req.file){
+
+        //     if(path.extname(req.file.filename) === '.jpeg' || path.extname(req.file.filename) === '.jpg'){
+        //         data.image = req.file.filename
+        //     }
+        //     else{
+        //         res.status(400).json({message:'Invalid file type'});
+
+        //         fs.unlinkSync(path.join(__dirname, `uploads/${req.file.filename}`));
+        //         return;
+        //     }
+            
+        // }
+
+        
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+});
+
+app.get('/read-users', async(req, res)=>{
+    const db = await config();
+    const users = db.collection('users');
+
+    const filePath = `${req.protocol}://${req.get('host')}/api-services`;
+
+    try{
+        const response = await users.find().toArray();
+
+        res.status(200).json({message: 'data fetched successfully', data: response, file_path:filePath });
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({messsage:'internal server error'});
+    }
+});
+
+app.get('/read-user-by-id/:id', async(req,res)=>{
+    const db = await config();
+    const users = db.collection('users');
+
+    try{
+        const response = await users.find({_id: new mongodb.ObjectId(req.params.id)}).toArray();
+        res.status(200).json({message: 'data fetched successfully', data:response });
     }
     catch(error){
         console.log(error);
@@ -52,3 +132,8 @@ app.post('/insert-data',upload, (req,res)=>{
 app.listen(5200, ()=>{
     console.log('server is running on port 5200');
 });
+
+
+// (()=>{
+//     console.log(`${req.procol}`);
+// })()
