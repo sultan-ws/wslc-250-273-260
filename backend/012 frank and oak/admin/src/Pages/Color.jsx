@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 // import ColorPicker from "@rc-component/color-picker";
 // import "@rc-component/color-picker/assets/index.css";
@@ -5,6 +6,28 @@ import React from "react";
 import "react-color-palette/css";
 function Color() {
   // let [color, setColor] = useColor("#651ecb");
+
+  const handleAddColor = async(e) =>{ 
+    e.preventDefault();
+    console.log('hello')
+
+    const data = {
+      name: e.target.color.value,
+      code: e.target.color_code.value
+    };
+
+    try{
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/color/add-color`, data);
+
+      if(response.status !== 200) return alert('Try after some time');
+
+      console.log(response.data);
+    }
+    catch(error){
+      console.log(error);
+      alert('Something went wrong');
+    }
+  }
 
   const setImage = () => {
     let imageFileInput = document.querySelector("#image_src");
@@ -43,6 +66,7 @@ function Color() {
       <div className="bg-[#f8f8f9] h-[50px] header w-full p-[12px] rounded-[10px_10px_0_0]">
         Add Colors
       </div>
+      <form action="" method="post" onSubmit={handleAddColor}>
       <div className="w-full p-[20px]">
         <label htmlFor="color">Color Name</label> <br />
         <input
@@ -92,10 +116,11 @@ function Color() {
             Pick Color
           </span>
         </div>
-        {/* <button className="bg-[#5351C9] text-white rounded-[5px]  w-[120px] h-[40px]">
-          Select Color
-        </button> */}
+        <button className="bg-[#5351C9] text-white rounded-[5px]  w-[120px] h-[40px]">
+          Add Color
+        </button>
       </div>
+      </form>
     </div>
   );
 }

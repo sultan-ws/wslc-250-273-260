@@ -3,6 +3,38 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const AddCategory = () => {
+  const nav = useNavigate();
+
+  const hendleAddcategory = async (e) =>{
+    
+    e.preventDefault();
+
+    
+
+    const data = {
+      name: e.target.name.value,
+      description: e.target.description.value,
+      status: e.target.status.value
+    }
+
+    console.log(data);
+
+    try{
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/add-category`, data);
+
+      if(response.status !== 200) return alert('Try after some time');
+
+      console.log(response);
+      alert('Category added successfully');
+      nav('/dashboard/category/view-category');
+    }
+    catch(error){
+      console.log(error);
+      alert('Something went wrong');
+    }
+
+
+  };
  
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white border rounded-[10px]">
@@ -10,7 +42,7 @@ const AddCategory = () => {
         Add Category
       </span>
       <div className="w-[90%] mx-auto my-[20px]">
-        <form method="post">
+        <form method="post" onSubmit={hendleAddcategory}>
           <div className="w-full my-[10px]">
             <label htmlFor="categoryName" className="block text-[#303640]">
               Category Name
@@ -56,6 +88,7 @@ const AddCategory = () => {
               type="radio"
               name="status"
               id="categoryStatus"
+              value={true}
               
               className="input my-[10px] mx-[10px] accent-[#5351c9] cursor-pointer"
             />
@@ -64,6 +97,7 @@ const AddCategory = () => {
               type="radio"
               name="status"
               id="categoryStatus"
+              value={false}
               
               className="input my-[10px] mx-[10px] accent-[#5351c9] cursor-pointer"
             />
