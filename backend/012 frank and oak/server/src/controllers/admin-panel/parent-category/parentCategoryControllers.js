@@ -17,6 +17,52 @@ const addParentCategory = async(req, res)=>{
     }
 };
 
+const readParentCategory = async (req, res) => {
+    try{
+        const response = await ParentCategory.find();
+
+        res.status(200).json({message: 'data fetched successfully', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+};
+
+const deleteParentCategory = async ( req, res) => {
+    try{
+        const response = await ParentCategory.deleteOne(req.params);
+
+
+        res.status(200).json({message: 'data fetched successfully', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+};
+
+const upadateStatus = async (req, res) => {
+    try{
+        const response = await ParentCategory.updateOne(
+            req.params,
+            {
+                $set:{status: req.body.newStatus}
+            }
+        );
+
+
+        res.status(200).json({message: 'data fetched successfully', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+};
+
 module.exports = {
-    addParentCategory
+    addParentCategory,
+    readParentCategory,
+    deleteParentCategory,
+    upadateStatus
 }

@@ -1,18 +1,26 @@
 
 //admin controllers
-const { 
+const {
     login
- } = require("./admin-panel/admin/adminControllers");
+} = require("./admin-panel/admin/adminControllers");
 
 
 // color controllers
 const { addColor } = require("./admin-panel/color/colorControllers");
 
 // parent category controllers
-const { addParentCategory } = require("./admin-panel/parent-category/parentCategoryControllers");
+const {
+    addParentCategory,
+    readParentCategory,
+    deleteParentCategory,
+    upadateStatus
+} = require("./admin-panel/parent-category/parentCategoryControllers");
 
 module.exports = {
     login,
     addColor,
-    addParentCategory
+    addParentCategory,
+    readParentCategory,
+    deleteParentCategory,
+    upadateStatus
 }
