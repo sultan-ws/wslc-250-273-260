@@ -3,7 +3,9 @@ const {
      addParentCategory,
      readParentCategory,
      deleteParentCategory, 
-     upadateStatus 
+     upadateStatus, 
+     deleteMultipleParentCategories,
+     readParentCategoryById
     } = require('../../controllers/controllers');
 
 const parentCategoryRouter = express.Router();
@@ -11,6 +13,8 @@ const parentCategoryRouter = express.Router();
 parentCategoryRouter.post('/add-category', addParentCategory);
 parentCategoryRouter.get('/read-categories', readParentCategory);
 parentCategoryRouter.delete('/delete-category/:_id', deleteParentCategory);
-parentCategoryRouter.put('/update-status/:_id', upadateStatus)
+parentCategoryRouter.put('/update-status/:_id', upadateStatus);
+parentCategoryRouter.put('/delete-categories', deleteMultipleParentCategories);
+parentCategoryRouter.get('/category-by-id/:_id', readParentCategoryById);
 
 module.exports = parentCategoryRouter;

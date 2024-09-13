@@ -13,7 +13,9 @@ const {
     addParentCategory,
     readParentCategory,
     deleteParentCategory,
-    upadateStatus
+    upadateStatus,
+    deleteMultipleParentCategories,
+    readParentCategoryById
 } = require("./admin-panel/parent-category/parentCategoryControllers");
 
 module.exports = {
@@ -22,5 +24,7 @@ module.exports = {
     addParentCategory,
     readParentCategory,
     deleteParentCategory,
-    upadateStatus
+    upadateStatus,
+    deleteMultipleParentCategories,
+    readParentCategoryById
 }

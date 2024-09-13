@@ -3,6 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const UpdateCategory = () => {
+  const {_id} = useParams();
+
+  const [data, setData] = useState({});
+
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/category-by-id/${_id}`)
+    .then((response)=>{
+      setData(response.data.data[0]);
+    })
+  },[_id])
  
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white border rounded-[10px]">
@@ -18,7 +28,7 @@ const UpdateCategory = () => {
             <input
               type="text"
               name="name"
-              
+              value={data.name}
               id="categoryName"
               placeholder="Category Name"
               
@@ -44,7 +54,7 @@ const UpdateCategory = () => {
               type="file"
               name="description"
               id="categoryDesc"
-             
+             value={data.description}
               className="input border w-full rounded-[5px] my-[10px]"
             />
           </div>

@@ -3,12 +3,14 @@ import React, { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const ViewCategory = () => {
   // let [show1, setShow1] = useState(false);
   // let [show2, setShow2] = useState(false);
   // let [show3, setShow3] = useState(false);
   // let [show4, setShow4] = useState(false);
+
 
   const [categories, setCategories] = useState([]);
   const [checkedCategoris, setCheckedCategories] = useState([]);
@@ -34,7 +36,64 @@ const ViewCategory = () => {
   };
 
   const handleMultiDelete = () => {
-    console.log(checkedCategoris);
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger"
+      },
+      buttonsStyling: false
+    });
+    swalWithBootstrapButtons.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        
+        axios
+        .put(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/delete-categories`, { ids: checkedCategoris })
+        .then((response)=>{
+          console.log(response.data);
+
+          setCategories((precategories)=> (
+            precategories.filter((category)=> !checkedCategoris.includes(category._id))
+          ))
+
+          setCheckedCategories([]);
+          swalWithBootstrapButtons.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success"
+          });
+
+        })
+        .catch((error)=>{
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#">Why do I have this issue?</a>'
+          });
+        })
+        
+       
+      } else if (
+        /* Read more about handling dismissals below */
+        result.dismiss === Swal.DismissReason.cancel
+      ) {
+        swalWithBootstrapButtons.fire({
+          title: "Cancelled",
+          text: "Your imaginary file is safe :)",
+          icon: "error"
+        });
+      }
+    });
+    
   };
 
   useEffect(()=>{
@@ -60,25 +119,59 @@ const ViewCategory = () => {
   useEffect(() => { readCategories() }, []);
 
   const handleDeletecategory = async (_id) => {
-    if (!window.confirm('Are you sure to delete')) return
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "py-2 px-4 bg-green-400 text-white",
+        cancelButton: "py-2 px-4 bg-red-500 text-white"
+      },
+      buttonsStyling: false
+    });
+    swalWithBootstrapButtons.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
 
-    try {
-      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/delete-category/${_id}`);
+        try {
+          axios.delete(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/delete-category/${_id}`)
+          .then((response)=>{
+            if (response.status !== 200) return alert('Something went wrong');
+      
+            setCategories((preCategories) => (
+              preCategories.filter((category) => category._id !== _id)
+            ));
+          })
+    
+         
+        }
+        catch (error) {
+          console.log(error);
+          alert('Something went wrong');
+        }
+        swalWithBootstrapButtons.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success"
+        });
+      } else if (
+        /* Read more about handling dismissals below */
+        result.dismiss === Swal.DismissReason.cancel
+      ) {
+        swalWithBootstrapButtons.fire({
+          title: "Cancelled",
+          text: "Your imaginary file is safe :)",
+          icon: "error"
+        });
+      }
+    });
 
-      if (response.status !== 200) return alert('Something went wrong');
+    
 
-      alert('data deleted successfully');
-
-      setCategories((preCategories) => (
-        preCategories.filter((category) => category._id !== _id)
-      ));
-    }
-    catch (error) {
-      console.log(error);
-      alert('Something went wrong');
-    }
-
-    console.log(_id);
   };
 
   const handleUpdateStatus = async (e) => {
@@ -91,7 +184,13 @@ const ViewCategory = () => {
 
       if (response.status !== 200) return alert('Something went wrong');
 
-      alert('Status updated successfully');
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Status has been updated",
+        showConfirmButton: false,
+        timer: 500
+      });
 
       setCategories((preCategories) => (
         preCategories.map((category) => {
@@ -176,7 +275,7 @@ const ViewCategory = () => {
                   <td>
                     <MdDelete className="my-[5px] text-red-500 cursor-pointer inline" onClick={() => { handleDeletecategory(category._id) }} />{" "}
                     |{" "}
-                    <Link to={`/dashboard/category/update-category/${'parentCategory._id'}`}>
+                    <Link to={`/dashboard/category/update-category/${category._id}`}>
                       <CiEdit className="my-[5px] text-yellow-500 cursor-pointer inline" />
                     </Link>
                   </td>

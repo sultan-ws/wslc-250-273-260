@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const AddCategory = () => {
   const nav = useNavigate();
@@ -25,8 +26,29 @@ const AddCategory = () => {
       if(response.status !== 200) return alert('Try after some time');
 
       console.log(response);
-      alert('Category added successfully');
-      nav('/dashboard/category/view-category');
+      let timerInterval;
+      Swal.fire({
+        title: "Category added",
+        html: "Redirect to view category in <b></b> milliseconds.",
+        timer: 500,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+          nav('/dashboard/category/view-category');
+        }
+      });
+      
     }
     catch(error){
       console.log(error);
