@@ -4,6 +4,8 @@ import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
+import tippy, { followCursor } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 const ViewCategory = () => {
   // let [show1, setShow1] = useState(false);
@@ -206,6 +208,48 @@ const ViewCategory = () => {
     }
   }
 
+  const handleToolTip = (e)=>{
+    tippy('#statusBtn', {
+      content: `Click to ${(e.target.textContent === 'Active') ? 'Inactive' : 'Active'}`,
+      followCursor: true,
+      plugins: [followCursor],
+       theme: 'tomato'
+    });
+  }
+  
+  const handleSearchCategory = (e)=>{
+
+    if(e.target.value){
+      
+      axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/search-category/${e.target.value}`)
+      .then((response)=>{
+        if(response.status === 404){
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "No match found!",
+            footer: '<a href="#">Why do I have this issue?</a>'
+          });
+        }
+
+        else if(response.status === 200){
+          setCategories(response.data.data);
+        }
+      })
+      .catch((error)=>{
+        console.log('error');
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "No match found!",
+          footer: '<a href="#">Why do I have this issue?</a>'
+        });
+      })
+    }
+    else{
+      readCategories();
+    }
+  }
 
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white rounded-[10px] border">
@@ -213,6 +257,9 @@ const ViewCategory = () => {
         View Category
       </span>
       <div className="w-[90%] mx-auto my-[20px]">
+        <div>
+          <input type="text" className="border px-2 py-2 w-full mb-4" placeholder="Search" onChange={handleSearchCategory} />
+        </div>
         <table className="w-full">
           <thead>
             <tr className="text-left border-b">
@@ -281,6 +328,8 @@ const ViewCategory = () => {
                   </td>
                   <td>
                     <button
+                    id="statusBtn"
+                    onMouseEnter={handleToolTip}
                       value={category._id}
                       className={`p-[4px_10px] rounded-sm ${(category.status) ? 'bg-green-400' : 'bg-red-500'} text-white`}
                       onClick={handleUpdateStatus}

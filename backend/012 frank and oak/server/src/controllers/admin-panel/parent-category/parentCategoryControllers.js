@@ -89,6 +89,44 @@ const readParentCategoryById = async (req, res) => {
     }
 };
 
+const upadteParentCategory = async (req, res) => {
+    try{
+        // console.log( req.params, req.body );
+        const response = await ParentCategory.findByIdAndUpdate(
+            req.params,
+            {
+                $set: req.body
+            }
+        );
+
+        if(!response) res.status(404).json({message :'please send a valid id'});
+
+        res.status(200).json({ message: 'success', data: 'response' });
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+}
+
+const searchParentCategory = async (req, res) => {
+    try{
+        // const response = await ParentCategory.find({name: {$regex: new RegExp(req.params.key)}});
+
+        const response = await ParentCategory.find({$or:[
+            {name: {$regex: new RegExp(req.params.key)}},
+            {description: {$regex: new RegExp(req.params.key)}}
+        ]});
+
+        if(response.length === 0) return res.status(404 ).json({message: 'no match found'});
+
+        res.status(200).json({message: 'data fetched successfully', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+};
 
 
 module.exports = {
@@ -97,5 +135,7 @@ module.exports = {
     deleteParentCategory,
     upadateStatus,
     deleteMultipleParentCategories,
-    readParentCategoryById
+    readParentCategoryById,
+    upadteParentCategory,
+    searchParentCategory
 }
