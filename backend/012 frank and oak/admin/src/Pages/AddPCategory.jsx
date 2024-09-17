@@ -2,7 +2,31 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 const AddPCategory = () => {
-  
+  const [parentCategories, setParentCategories] = useState([]);
+
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/active-categories`)
+    .then((response)=>{
+      console.log(response.data.data)
+      setParentCategories(response.data.data);
+    })
+    .catch(()=>{
+      alert('Something went wrong');
+    })
+  },[]);
+
+  const handleAddCategory = (e)=>{
+    e.preventDefault();
+
+
+    axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/product-category/add-category`, e.target)
+    .then((response)=>{
+      console.log(response)
+    })
+    .catch(()=>{
+      alert('Something went wrong');
+    })
+  };
 
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white border rounded-[10px]">
@@ -10,7 +34,7 @@ const AddPCategory = () => {
         Add Category
       </span>
       <div className="w-[90%] mx-auto my-[20px]">
-        <form method="post" >
+        <form method="post" onSubmit={handleAddCategory}>
           <div className="w-full my-[10px]">
             <label htmlFor="categoryName" className="block text-[#303640]">
               Category Name
@@ -38,11 +62,12 @@ const AddPCategory = () => {
             <label htmlFor="categoryImg" className="block text-[#303640]">
               Parent Category
             </label>
-            <select name="parent_category" id="" className="border w-full rounded-[5px] my-[10px] category input">
-             
-              <option>men</option>
-              <option>women</option>
-              <option>kids</option>
+            <select name="parent_category" id="" className="input border w-full rounded-[5px] my-[10px] category input">
+             {
+              parentCategories.map((category)=>(
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))
+             }
             </select>
           </div>
           <div className="w-full my-[10px]">
@@ -67,7 +92,7 @@ const AddPCategory = () => {
               type="radio"
               name="status"
               id="categoryStatus"
-              
+              value={true}
               className="input my-[10px] mx-[10px] accent-[#5351c9] cursor-pointer"
             />
             <span>Display</span>
@@ -75,14 +100,14 @@ const AddPCategory = () => {
               type="radio"
               name="status"
               id="categoryStatus"
-              
+              value={false}
               className="input my-[10px] mx-[10px] accent-[#5351c9] cursor-pointer"
             />
             <span>Hide</span>
           </div>
           <div className="w-full my-[20px] ">
             <button type="submit" className="bg-[#5351c9] rounded-md text-white w-[100px] h-[35px]">
-              Add Size
+              Add category
             </button>
           </div>
         </form>

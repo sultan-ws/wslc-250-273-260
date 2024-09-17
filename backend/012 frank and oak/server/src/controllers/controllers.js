@@ -17,8 +17,14 @@ const {
     deleteMultipleParentCategories,
     readParentCategoryById,
     upadteParentCategory,
-    searchParentCategory
+    searchParentCategory,
+    trueParentCategory
 } = require("./admin-panel/parent-category/parentCategoryControllers");
+
+// product category
+const { 
+    addProductCategory 
+} = require("./admin-panel/product-category/productcategoryControllers");
 
 module.exports = {
     login,
@@ -30,5 +36,7 @@ module.exports = {
     deleteMultipleParentCategories,
     readParentCategoryById,
     upadteParentCategory,
-    searchParentCategory
+    searchParentCategory,
+    trueParentCategory,
+    addProductCategory
 }

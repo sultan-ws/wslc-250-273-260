@@ -128,6 +128,18 @@ const searchParentCategory = async (req, res) => {
     }
 };
 
+const trueParentCategory = async (req, res) => {
+    try{
+        const response = await ParentCategory.find({status: true});
+
+        res.status(200).json({message: 'data fetched successfully', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+};
+
 
 module.exports = {
     addParentCategory,
@@ -137,5 +149,6 @@ module.exports = {
     deleteMultipleParentCategories,
     readParentCategoryById,
     upadteParentCategory,
-    searchParentCategory
+    searchParentCategory,
+    trueParentCategory
 }
