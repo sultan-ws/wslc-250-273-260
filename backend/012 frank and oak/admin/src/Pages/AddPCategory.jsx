@@ -1,14 +1,22 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AddPCategory = () => {
+  const nav = useNavigate();
   const [parentCategories, setParentCategories] = useState([]);
+  const [imgPre, setImgPre] = useState('');
 
   useEffect(()=>{
     axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/active-categories`)
     .then((response)=>{
-      console.log(response.data.data)
-      setParentCategories(response.data.data);
+     
+
+      if(response.status === 200) {
+        console.log(response.data.data)
+        setParentCategories(response.data.data);
+        
+      }
     })
     .catch(()=>{
       alert('Something went wrong');
@@ -22,11 +30,30 @@ const AddPCategory = () => {
     axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/product-category/add-category`, e.target)
     .then((response)=>{
       console.log(response)
+      if(response.status === 200 )  nav('/dashboard/products/view-category');
+     
     })
     .catch(()=>{
       alert('Something went wrong');
     })
   };
+
+  const handlePrev = (e)=>{
+    const file = e.target.files[0];
+
+    if(file){
+      const reader = new FileReader(); // blob
+
+      reader.readAsDataURL(file);
+      console.log(reader);
+
+      reader.onload = () =>{
+        setImgPre(reader.result);
+
+        console.log(reader.result);
+      }
+    }
+  }
 
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white border rounded-[10px]">
@@ -56,7 +83,10 @@ const AddPCategory = () => {
               name="thumbnail"
               id="categoryImg"
               className="input border w-full rounded-[5px] my-[10px] category"
+              onChange={handlePrev}
             />
+
+            <img src={imgPre} style={{width:'250px'}} alt="" />
           </div>
           <div className="w-full my-[10px]">
             <label htmlFor="categoryImg" className="block text-[#303640]">

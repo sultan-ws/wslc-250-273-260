@@ -23,7 +23,8 @@ const {
 
 // product category
 const { 
-    addProductCategory 
+    addProductCategory, 
+    readProductCategory
 } = require("./admin-panel/product-category/productcategoryControllers");
 
 module.exports = {
@@ -38,5 +39,6 @@ module.exports = {
     upadteParentCategory,
     searchParentCategory,
     trueParentCategory,
-    addProductCategory
+    addProductCategory,
+    readProductCategory
 }
