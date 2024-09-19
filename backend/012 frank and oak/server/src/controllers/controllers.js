@@ -1,7 +1,9 @@
 
 //admin controllers
 const {
-    login
+    login,
+    readAdmin,
+    updateAdmin
 } = require("./admin-panel/admin/adminControllers");
 
 
@@ -40,5 +42,7 @@ module.exports = {
     searchParentCategory,
     trueParentCategory,
     addProductCategory,
-    readProductCategory
+    readProductCategory,
+    readAdmin,
+    updateAdmin
 }

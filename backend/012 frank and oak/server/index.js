@@ -8,7 +8,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 app.use('/fran-and-oak-files/product-category', express.static('src/uploads/product-category'));
+app.use('/fran-and-oak-files/admin', express.static('src/uploads/admin'));
+
 app.use('/api', allRoutes);
 
 app.listen(process.env.PORT, ()=>{
