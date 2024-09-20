@@ -17,6 +17,8 @@ function Profile() {
   const [admin, setAdmin] = useState({});
   const [preImage, setPreImage] = useState({});
   const [filepath, setFilepath] = useState('');
+  const [emailProcess, setEmailProcess] = useState(false);
+  const [otpBtnText, setOtpBtnText] = useState('Genrate OTP')
 
 
   //read admin
@@ -40,37 +42,89 @@ function Profile() {
     }
   }, []);
 
-  const handleImgPre = (e)=>{
+  const handleImgPre = (e) => {
 
     const file = e.target.files[0];
 
-    if(file){
+    if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = ()=>{
-        setPreImage((pre)=>(
-          {...pre, [e.target.name]: reader.result}
+      reader.onload = () => {
+        setPreImage((pre) => (
+          { ...pre, [e.target.name]: reader.result }
         ));
       }
     }
   };
 
-  const handleUpdateAdmin = (e)=>{
+  const handleUpdateAdmin = (e) => {
     e.preventDefault();
 
     const form = new FormData(e.target);
 
     axios.put(`${process.env.REACT_APP_API_URL}/api/admin-panel/admin/update-admin/${admin._id}`, form)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert('Something went wrong');
+      })
+  }
+
+  const handleGenrateOtp = () => {
+
+    axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/admin/genrate-otp`, { email: admin.email })
+      .then((response) => {
+        console.log(response);
+
+
+        setEmailProcess(true);
+
+        let i = 60;
+
+        setOtpBtnText(`Regenrate OTP in ${i}s`);
+        i--;
+
+        const interval = setInterval(() => {
+
+
+          setOtpBtnText(`Regenrate OTP in ${i}s`);
+          if (i === 0) {
+            clearInterval(interval);
+            setEmailProcess(false);
+            setOtpBtnText('Genrate OTP')
+          }
+
+          i--;
+        }, 1000);
+      })
+      .catch((error) => {
+
+      })
+
+
+
+
+  }
+
+  const handleUpdateEmail = (e)=>{
+    e.preventDefault();
+  
+    axios.put(`${process.env.REACT_APP_API_URL}/api/admin-panel/admin/update-email`,
+      {
+        currentemail: admin.email,
+        email: e.target.newemail.value,
+        otp: e.target.userotp.value
+      }
+    )
     .then((response)=>{
       console.log(response.data);
     })
     .catch((error)=>{
       console.log(error);
-      alert('Something went wrong');
     })
-  }
-
-
+  };
 
   return (
     <div>
@@ -224,7 +278,7 @@ function Profile() {
           Update Email
         </span>
         <div className="w-full p-[30px]">
-          <form method="post">
+          <form method="post" onSubmit={handleUpdateEmail}>
             <div className="w-full mb-[10px]">
               <span className="block m-[15px_0]">Current Email</span>
               <input
@@ -232,9 +286,22 @@ function Profile() {
                 value={admin.email}
                 onChange={(e) => { setAdmin({ ...admin, email: e.target.value }) }}
                 className="w-full border h-[35px] rounded-[5px] p-2 input"
+                readOnly
               />
             </div>
-            <div className="w-full mb-[10px]">
+            <div>
+              <button
+                disabled={emailProcess}
+                type="button"
+                onClick={handleGenrateOtp}
+                className={`px-[50px] block h-[40px] rounded-md text-white bg-[#5351c9]  my-[30px]`}>
+                {otpBtnText}
+              </button>
+            </div>
+            <div className="w-full mb-[10px]" style={{
+              display: (emailProcess) ? '' : 'none'
+
+            }}>
               <span className="block m-[15px_0]">OTP</span>
               <input
                 type="text"
@@ -250,21 +317,19 @@ function Profile() {
 
                 className="w-full border h-[35px] rounded-[5px] p-2 input"
               />
+
+              <div>
+                <button
+
+                  type="submit"
+
+                  className={`w-[150px] block h-[40px] rounded-md text-white bg-[#5351c9]  my-[30px]`}>
+                  Update Email
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
 
-              className={`w-[150px] h-[40px] rounded-md text-white  my-[30px]`}>
-              {'otpBtnText'}
-            </button>
 
-            <button
-
-              type="button"
-
-              className={`w-[150px] block h-[40px] rounded-md text-white bg-[#5351c9]  my-[30px]`}>
-              Update Email
-            </button>
           </form>
         </div>
       </div>
