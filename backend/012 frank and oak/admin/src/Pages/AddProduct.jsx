@@ -1,6 +1,59 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const AddProduct = () => {
+
+  const [parentCategories, setParentCategories] = useState([]);
+  const [parentCategory, setParentCategory] = useState('');
+  const [productCategory, setProductCategory] = useState([]);
+  const [colors, setColors] = useState([]);
+  
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/active-categories`)
+    .then((response)=>{
+     
+
+      if(response.status === 200) {
+        console.log(response.data.data)
+        setParentCategories(response.data.data);
+        
+      }
+    })
+    .catch(()=>{
+      alert('Something went wrong');
+    })
+  },[]);
+
+  useEffect(()=>{
+    if(!parentCategory) return;
+
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/product-category/read-category-by-parent-category/${parentCategory}`)
+    .then((response)=>{
+     
+
+      if(response.status === 200) {
+        console.log(response.data.data)
+        setProductCategory(response.data.data);
+        
+      }
+    })
+    .catch(()=>{
+      alert('Something went wrong');
+    })
+
+  },[parentCategory]);
+
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/color/active-colors`)
+    .then((response)=>{
+      console.log(response.data.data);
+      setColors(response.data.data);
+    })
+    .catch((error)=>{
+      console.log(error);
+    });
+  },[]);
+
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white rounded-[10px] border">
       <span className="block border-b bg-[#f8f8f9] text-[#303640] text-[20px] font-bold p-[8px_16px] h-[40px] rounded-[10px_10px_0_0]">
@@ -116,16 +169,14 @@ const AddProduct = () => {
               id="parent_category"
               name="parent_category"
               className="w-full input border p-2 rounded-[5px] my-[10px] cursor-pointer"
+              onChange={(e)=>(setParentCategory(e.target.value))}
             >
-              <option value="default" selected disabled hidden>
-                --Select Parent Category--
-              </option>
-              <option value="men" className="cursor-pointer">
-                Men
-              </option>
-              <option value="women" className="cursor-pointer">
-                Women
-              </option>
+              <option>--- Please select parent category ---</option>
+               {
+              parentCategories.map((category)=>(
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))
+             }
             </select>
           </div>
           <div className="w-full my-[10px]">
@@ -137,15 +188,11 @@ const AddProduct = () => {
               name="product_category"
               className="w-full input border p-2 rounded-[5px] my-[10px] cursor-pointer"
             >
-              <option value="default" selected disabled hidden>
-                --Select Product Category--
-              </option>
-              <option value="tShirt" className="cursor-pointer">
-                T-shirt
-              </option>
-              <option value="shirt" className="cursor-pointer">
-                Shirt
-              </option>
+              {
+              productCategory.map((category)=>(
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))
+             }
             </select>
           </div>
           <div className="w-full grid grid-cols-[2fr_2fr] gap-[20px]">
@@ -161,8 +208,8 @@ const AddProduct = () => {
                 <option value="default" selected disabled hidden>
                   --Select Stock--
                 </option>
-                <option value="inStock">In Stock</option>
-                <option value="outStock">Out of Stock</option>
+                <option value={true}>In Stock</option>
+                <option value={false}>Out of Stock</option>
               </select>
             </div>
             <div>
@@ -202,19 +249,17 @@ const AddProduct = () => {
               <label htmlFor="color" className="block text-[#303640]">
                 Color
               </label>
-              <select
-                name="color"
-                id="color"
-                className="p-2 input w-full border rounded-[5px] my-[10px]"
-              >
-                <option value="default" selected disabled hidden>
-                  --Select Color--
-                </option>
-                <option value="red">Red</option>
-                <option value="orange">Orange</option>
-                <option value="yellow">Yellow</option>
-                <option value="white">White</option>
-              </select>
+              <ul>
+              {
+                colors.map((color, index)=>(
+                  <li key={index}>
+                    <input type="checkbox" value={color._id} />
+                    <span className="mx-10 ">{color.name}</span>
+                    <span className={`px-6 bg-[${color.code}] border`}></span>
+                  </li>
+                ))
+              }
+              </ul>
             </div>
           </div>
           <div className="w-full my-[10px] ">

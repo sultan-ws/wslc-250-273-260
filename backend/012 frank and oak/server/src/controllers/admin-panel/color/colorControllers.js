@@ -16,6 +16,20 @@ const addColor = async( req, res ) =>{
     }
 };
 
+const trueColors = async(req, res) =>{ 
+     try{
+
+        const response = await Colors.find({status: true});
+
+        res.status(200).json({message: 'success', data: response});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message:'Internal server error'});
+    }
+}
+
 module.exports = {
-    addColor
+    addColor,
+    trueColors
 }

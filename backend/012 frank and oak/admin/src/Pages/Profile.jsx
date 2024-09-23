@@ -18,7 +18,8 @@ function Profile() {
   const [preImage, setPreImage] = useState({});
   const [filepath, setFilepath] = useState('');
   const [emailProcess, setEmailProcess] = useState(false);
-  const [otpBtnText, setOtpBtnText] = useState('Genrate OTP')
+  const [otpBtnText, setOtpBtnText] = useState('Genrate OTP');
+  const [isLoader, setLoader] = useState('none');
 
 
   //read admin
@@ -73,9 +74,11 @@ function Profile() {
   }
 
   const handleGenrateOtp = () => {
+    setLoader('block');
 
     axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/admin/genrate-otp`, { email: admin.email })
       .then((response) => {
+        setLoader('none');
         console.log(response);
 
 
@@ -128,6 +131,11 @@ function Profile() {
 
   return (
     <div>
+    <div>
+      <div style={{width:'400px', position:'fixed', top:'50%', left:'50%', transform:'translate(-50%, -50%)', zIndex:'99999', display:isLoader}}>
+        <img src="https://media.tenor.com/XasjKGMk_wAAAAAM/load-loading.gif" alt="" />
+      </div>
+    </div>
       <div className="w-[90%] mx-auto mt-[140px] mb-[20px] bg-white border rounded-[10px]">
         <span className="block text-[#303640] bg-[#f8f8f9] rounded-[10px_10px_0_0] h-[60px] p-[15px_15px] box-border font-bold text-[25px] border-b">
           Profile

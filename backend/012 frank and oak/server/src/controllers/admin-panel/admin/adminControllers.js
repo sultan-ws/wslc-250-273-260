@@ -105,7 +105,7 @@ const genrateOtpToUpdateEmail = async(req, res)=>{
         });
 
         const mailOption = {
-            from: process.env.DOMAIN_EMAIL,
+            from: 'noreply@mail.com',
             to: req.body.email,
             subject: 'OTP for update email',
             text: `Your OTP is ${genratedOtp}`

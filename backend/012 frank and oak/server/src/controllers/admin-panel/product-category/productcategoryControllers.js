@@ -43,9 +43,30 @@ const readProductCategory = async(req, res) => {
     }
 }
 
+const productCategoryByParentCategory = async(req, res) => {
+    try{
+        const productCategories = await ProductCategory.find(req.params);
+
+        const response = productCategories.map((category)=>{
+            const {...cat} = category._doc;
+        
+            cat.slug = category.parent_category.name + '-' + category.name;
+            cat.thumbnail =  `${req.protocol}://${req.get('host')}/fran-and-oak-files/product-category/${category.thumbnail}`
+            return cat
+    });
+
+        res.status(200).json({message: 'success', data: response });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({message:'internal server error'});
+    }
+}
+
 module.exports = {
     addProductCategory,
-    readProductCategory
+    readProductCategory,
+    productCategoryByParentCategory
 }
 
 // men-tshirt
