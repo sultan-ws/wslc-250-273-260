@@ -3,7 +3,16 @@ const path = require('path');
 
 const multerStorage = (foldername)=> multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, `src/uploads/${foldername}`)
+
+
+        if(foldername === 'products'){
+            cb(null, `src/uploads/${foldername}/${file.fieldname}`);
+        }
+        else{
+            cb(null, `src/uploads/${foldername}`)
+        }
+        console.log(file)
+        
     },
     filename: (req, file, cb) => {
         const extname = path.extname(file.originalname);
@@ -28,6 +37,14 @@ const filesUploads = (foldername)=> multer({storage: multerStorage(foldername)})
         name:'footer_logo',
         maxCount: 1
     },
+    {
+        name:'hover_thumbnail',
+        maxCount: 1
+    },
+    {
+        name:'gallery',
+        maxCount: 12
+    }
 ]);
 
 module.exports = filesUploads;

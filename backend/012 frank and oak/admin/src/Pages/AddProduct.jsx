@@ -7,6 +7,7 @@ const AddProduct = () => {
   const [parentCategory, setParentCategory] = useState('');
   const [productCategory, setProductCategory] = useState([]);
   const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
   
   useEffect(()=>{
     axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/active-categories`)
@@ -54,13 +55,42 @@ const AddProduct = () => {
     });
   },[]);
 
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/size/active-sizes`)
+    .then((response)=>{
+      if(response.status === 200) {
+        console.log(response.data.data)
+        setSizes(response.data.data);        
+      }
+    })
+    .catch((errro)=>{
+      alert('something went wrong');
+    })
+  },[]);
+
+  const handleInsertProduct = (e)=>{
+    e.preventDefault();
+
+    if(e.target.parent_category.value === 'false') return alert('Please select parent category');
+
+
+    axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/product/insert-product`, e.target)
+    .then((response)=>{
+      console.log(response);
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+
+  };
+
   return (
     <div className="w-[90%] mx-auto my-[150px] bg-white rounded-[10px] border">
       <span className="block border-b bg-[#f8f8f9] text-[#303640] text-[20px] font-bold p-[8px_16px] h-[40px] rounded-[10px_10px_0_0]">
         Product Details
       </span>
       <div className="w-[90%] mx-auto my-[20px]">
-        <form>
+        <form method="post" onSubmit={handleInsertProduct}>
           <div className="w-full my-[10px]">
             <label htmlFor="product_name" className="block text-[#303640]">
               Product Name
@@ -68,7 +98,7 @@ const AddProduct = () => {
             <input
               type="text"
               id="product_name"
-              name="product_name"
+              name="name"
               placeholder="Name"
               className="w-full input border p-2 rounded-[5px] my-[10px]"
             />
@@ -79,7 +109,7 @@ const AddProduct = () => {
             </label>
             <textarea
               id="product_desc"
-              name="product_desc"
+              name="description"
               placeholder="Description"
               rows={3}
               cols={10}
@@ -95,7 +125,7 @@ const AddProduct = () => {
             </label>
             <textarea
               id="product_short_desc"
-              name="product_short_desc"
+              name="short_description"
               placeholder="Short Description"
               rows={2}
               cols={10}
@@ -109,7 +139,7 @@ const AddProduct = () => {
             <input
               type="file"
               id="product_img"
-              name="product_img"
+              name="thumbnail"
               className="w-full input border rounded-[5px] my-[10px] category"
             />
           </div>
@@ -120,7 +150,7 @@ const AddProduct = () => {
             <input
               type="file"
               id="image_animation"
-              name="image_animation"
+              name="hover_thumbnail"
               className="w-full input border rounded-[5px] my-[10px] category"
             />
           </div>
@@ -131,8 +161,9 @@ const AddProduct = () => {
             <input
               type="file"
               id="product_gallery"
-              name="product_gallery"
+              name="gallery"
               className="w-full input border rounded-[5px] my-[10px] category"
+              multiple
             />
           </div>
           <div className="w-full my-[10px] grid grid-cols-[2fr_2fr] gap-[20px]">
@@ -143,7 +174,7 @@ const AddProduct = () => {
               <input
                 type="text"
                 id="product_price"
-                name="product_price"
+                name="price"
                 placeholder="Product Price"
                 className="w-full input border rounded-[5px] my-[10px] p-2"
               />
@@ -155,7 +186,7 @@ const AddProduct = () => {
               <input
                 type="text"
                 id="product_mrp"
-                name="product_mrp"
+                name="actual_price"
                 placeholder="Product MRP"
                 className="w-full input border rounded-[5px] my-[10px] p-2"
               />
@@ -171,7 +202,7 @@ const AddProduct = () => {
               className="w-full input border p-2 rounded-[5px] my-[10px] cursor-pointer"
               onChange={(e)=>(setParentCategory(e.target.value))}
             >
-              <option>--- Please select parent category ---</option>
+              <option value={false}>--- Please select parent category ---</option>
                {
               parentCategories.map((category)=>(
                 <option key={category._id} value={category._id}>{category.name}</option>
@@ -228,34 +259,30 @@ const AddProduct = () => {
           <div className="w-full grid grid-cols-[2fr_2fr] gap-[20px]">
             <div>
               <label htmlFor="size" className="block text-[#303640]">
-                Size
-              </label>
-              <select
-                name="size"
-                id="size"
-                className="p-2 input w-full border rounded-[5px] my-[10px]"
-              >
-                <option value="default" selected disabled hidden>
-                  --Select Size--
-                </option>
-                <option value="s">S</option>
-                <option value="m">M</option>
-                <option value="l">L</option>
-                <option value="xl">XL</option>
-                <option value="xxl">XXL</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="color" className="block text-[#303640]">
                 Color
               </label>
               <ul>
               {
                 colors.map((color, index)=>(
                   <li key={index}>
-                    <input type="checkbox" value={color._id} />
+                    <input type="checkbox" value={color._id} name="sizes[]"/>
                     <span className="mx-10 ">{color.name}</span>
                     <span className={`px-6 bg-[${color.code}] border`}></span>
+                  </li>
+                ))
+              }
+              </ul>
+            </div>
+            <div>
+              <label htmlFor="color" className="block text-[#303640]">
+                Size
+              </label>
+              <ul>
+              {
+                sizes.map((size, index)=>(
+                  <li key={index}>
+                    <input type="checkbox" value={size._id} name="colors[]" />
+                    <span className="mx-10 ">{size.name}</span>
                   </li>
                 ))
               }
@@ -270,7 +297,7 @@ const AddProduct = () => {
               type="radio"
               name="status"
               id="status"
-              value="0"
+              value={true}
               className="my-[10px] mx-[20px] accent-[#5351c9]"
             />
             <span>Display</span>
@@ -278,7 +305,7 @@ const AddProduct = () => {
               type="radio"
               name="status"
               id="status"
-              value="1"
+              value={false}
               className="my-[10px] mx-[20px] accent-[#5351c9]"
               checked
             />

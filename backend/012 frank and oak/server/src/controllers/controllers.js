@@ -31,6 +31,10 @@ const {
     readProductCategory,
     productCategoryByParentCategory
 } = require("./admin-panel/product-category/productcategoryControllers");
+const { insertProduct, readProducts } = require("./admin-panel/product/productControllers");
+
+//size controller
+const { trueSizes } = require("./admin-panel/size/sizeControllers");
 
 module.exports = {
     login,
@@ -51,5 +55,8 @@ module.exports = {
     genrateOtpToUpdateEmail,
     upadteAdminEmail,
     productCategoryByParentCategory,
-    trueColors
-}
+    trueColors,
+    trueSizes,
+    insertProduct,
+    readProducts
+};

@@ -3,6 +3,8 @@ const adminRoutes = require('./routes/admin-panel/admin');
 const colorRouter = require('./routes/admin-panel/color');
 const parentCategoryRouter = require('./routes/admin-panel/parentCategory');
 const productCategoryRouter = require('./routes/admin-panel/productCategory');
+const sizeRouter = require('./routes/admin-panel/size');
+const productRouter = require('./routes/admin-panel/product');
 
 
 
@@ -14,6 +16,8 @@ adminRouter.use('/admin', adminRoutes);
 adminRouter.use('/color', colorRouter);
 adminRouter.use('/parent-category', parentCategoryRouter);
 adminRouter.use('/product-category', productCategoryRouter);
+adminRouter.use('/size', sizeRouter);
+adminRouter.use('/product', productRouter);
 
 
 allRoutes.use('/admin-panel', adminRouter);
