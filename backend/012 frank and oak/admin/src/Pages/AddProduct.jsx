@@ -8,6 +8,37 @@ const AddProduct = () => {
   const [productCategory, setProductCategory] = useState([]);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
+
+  const [checkedSizes, setCheckedSizes] = useState([]);
+  const [checkedColors, setCheckedColors] = useState([]);
+
+  const handleCheckSize = (e)=>{
+    if(e.target.checked){
+      setCheckedSizes((pre)=> (
+        [...pre, e.target.value]
+      ));
+    }
+    else
+    {
+      setCheckedSizes((pre)=> (
+        pre.filter(item => item !== e.target.value)
+      ));
+    }
+  };
+
+  const handleCheckColor = (e)=>{
+    if(e.target.checked){
+      setCheckedColors((pre)=> (
+        [...pre, e.target.value]
+      ));
+    }
+    else
+    {
+      setCheckedColors((pre)=> (
+        pre.filter(item => item !== e.target.value)
+      ));
+    }
+  };
   
   useEffect(()=>{
     axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/parent-category/active-categories`)
@@ -71,10 +102,16 @@ const AddProduct = () => {
   const handleInsertProduct = (e)=>{
     e.preventDefault();
 
+    // console.log(checkedSizes, checkedSizes);
+
     if(e.target.parent_category.value === 'false') return alert('Please select parent category');
 
+    const data = new FormData(e.target);
+    data.append('colors', JSON.stringify(checkedColors));
+    data.append('sizes', JSON.stringify(checkedSizes));
 
-    axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/product/insert-product`, e.target)
+
+    axios.post(`${process.env.REACT_APP_API_URL}/api/admin-panel/product/insert-product`, data)
     .then((response)=>{
       console.log(response);
     })
@@ -265,9 +302,11 @@ const AddProduct = () => {
               {
                 colors.map((color, index)=>(
                   <li key={index}>
-                    <input type="checkbox" value={color._id} name="sizes[]"/>
+                    <input type="checkbox" value={color._id} onClick={handleCheckSize}/>
                     <span className="mx-10 ">{color.name}</span>
-                    <span className={`px-6 bg-[${color.code}] border`}></span>
+                    <span className={`px-6 border`} style={{
+                      backgroundColor: color.code
+                    }}></span>
                   </li>
                 ))
               }
@@ -281,7 +320,7 @@ const AddProduct = () => {
               {
                 sizes.map((size, index)=>(
                   <li key={index}>
-                    <input type="checkbox" value={size._id} name="colors[]" />
+                    <input type="checkbox" value={size._id} onClick={handleCheckColor} />
                     <span className="mx-10 ">{size.name}</span>
                   </li>
                 ))

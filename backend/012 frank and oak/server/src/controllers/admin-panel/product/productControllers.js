@@ -1,15 +1,18 @@
 const Product = require('./../../../models/product/product');
 
 const insertProduct = async (req, res) => {
-    try{
+    try {
         const data = req.body;
 
-        if(req.files){
-            if(req.files.thumbnail) data.thumbnail = req.files.thumbnail[0].filename;
+        data.color_ids = JSON.parse(data.colors);
+        data.size_ids = JSON.parse(data.sizes);
 
-            if(req.files.hover_thumbnail) data.hover_thumbnail = req.files.hover_thumbnail[0].filename
+        if (req.files) {
+            if (req.files.thumbnail) data.thumbnail = req.files.thumbnail[0].filename;
 
-            if(req.files.gallery) data.gallery = req.files.gallery.map(file => file.filename);
+            if (req.files.hover_thumbnail) data.hover_thumbnail = req.files.hover_thumbnail[0].filename
+
+            if (req.files.gallery) data.gallery = req.files.gallery.map(file => file.filename);
 
         }
 
@@ -19,27 +22,26 @@ const insertProduct = async (req, res) => {
 
         const response = await dataToSave.save();
 
-        res.status(200).json({message: 'success', data: response});
+        res.status(200).json({ message: 'success', data: response });
     }
-    catch(error){
+    catch (error) {
         console.log(error);
-        res.status(500).json({message: 'internal server error'});
+        res.status(500).json({ message: 'internal server error' });
     }
 };
 
-const readProducts = async (req, res) =>{
-    try{
+const readProducts = async (req, res) => {
+    try {
         const response = await Product.find()
-        .populate('parent_category')
-        .populate('product_category')
-        .populate('colors')
-        .populate('sizes')       
-        .exec();
+            .populate('parent_category')
+            .populate('product_category')
+            .populate( {path: 'color_ids'})
+            .populate({path: 'size_ids'});
 
 
-        res.status(200).json({message: 'success', data: response});
+        res.status(200).json({ message: 'success', data: response });
     }
-    catch(error){
+    catch (error) {
         console.log(error);
     }
 }

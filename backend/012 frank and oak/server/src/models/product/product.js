@@ -22,13 +22,13 @@ const productSchema = new mongoose.Schema({
         default: true
     },
     brand: String,
-    sizes: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'sizes'
+    size_ids:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'sizes'
     }],
-    colors: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'colors'
+    color_ids:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'colors'
     }],
     created_at:Date,
     updated_at:Date,
@@ -38,29 +38,22 @@ const productSchema = new mongoose.Schema({
     }
 });
 
-productSchema.pre('save', (next)=>{
+productSchema.pre('save', function(next) {
     const currentDate = new Date();
-
-    if(this.new){
+    
+    if (this.isNew) {  // Use 'this.isNew' to check if it's a new document
         this.created_at = currentDate;
     }
-    else{
-        this.updated_at = currentDate;
-    }
-
     next();
 });
 
-productSchema.pre('updateOne', (next)=>{
-    const currentDate = new Date();
-    this.updated_at = currentDate;
+productSchema.pre('updateOne', function(next) {
+    this.set({ updated_at: new Date() });
     next();
 });
 
-
-productSchema.pre('findByIdAndUpdate', (next)=>{
-    const currentDate = new Date();
-    this.updated_at = currentDate;
+productSchema.pre('findByIdAndUpdate', function(next) {
+    this.set({ updated_at: new Date() });
     next();
 });
 
