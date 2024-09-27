@@ -6,6 +6,7 @@ import { SiGoogle } from "react-icons/si";
 import { BiLogoFacebook } from "react-icons/bi";
 import Link from "next/link";
 import axios from "axios";
+import Cookie from 'js-cookie';
 
 const LoginForm = ({ close }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +14,8 @@ const LoginForm = ({ close }) => {
 
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+
+  const [ loginForm, setLoginForm ] = useState({});
 
   const validateForm = () => {
     const newErrors = {};
@@ -63,6 +66,33 @@ const LoginForm = ({ close }) => {
     })
     //abc@QWE123!
   }
+
+
+  const handleRegisterUser = (e)=>{
+    axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/user/register`, formData)
+    .then((response)=>{
+      console.log(response.data);
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
+
+
+  const handleLogin = (e)=>{
+
+    axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/user/login`, loginForm)
+    .then((response)=>{
+      console.log(response.data);
+
+      Cookie.set('user-frank', JSON.stringify(response.data));
+
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
+
 
   return (
     <div className="w-[600px]  p-[30px] h-[650px] bg-white absolute top-[20px] left-[50%] translate-x-[-50%] overflow-y-scroll">
@@ -220,7 +250,7 @@ const LoginForm = ({ close }) => {
               />
               <button
                 type="button" className="w-full h-[40px] bg-black text-white"
-                onClick={handleGenrateOtp}
+                onClick={handleRegisterUser}
               >
                 Register
               </button>
@@ -234,6 +264,7 @@ const LoginForm = ({ close }) => {
             <input
               type="email"
               name="email"
+              onChange={(e)=>{setLoginForm({...loginForm, email: e.target.value})}}
               placeholder="Email Address"
               className="p-[10px] focus:outline-none w-full border border-black text-[14px]"
             />
@@ -241,6 +272,7 @@ const LoginForm = ({ close }) => {
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
+              onChange={(e)=>{setLoginForm({...loginForm, password: e.target.value})}}
               className="p-[10px] focus:outline-none w-full border border-black text-[14px]"
             />
             <span
@@ -254,7 +286,7 @@ const LoginForm = ({ close }) => {
                 Forgot Password?
               </span>
             </Link>
-            <button className="w-full h-[40px] bg-black text-white">
+            <button type="button" onClick={handleLogin} className="w-full h-[40px] bg-black text-white">
               Log In
             </button>
           </form>

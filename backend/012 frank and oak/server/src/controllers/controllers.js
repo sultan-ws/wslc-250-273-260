@@ -38,7 +38,7 @@ const { trueSizes } = require("./admin-panel/size/sizeControllers");
 
 
 // website controllers
-const { genrateOtp } = require("./website/user/userControllers");
+const { genrateOtp, registerUser, userLogin } = require("./website/user/userControllers");
 
 module.exports = {
     login,
@@ -63,5 +63,7 @@ module.exports = {
     trueSizes,
     insertProduct,
     readProducts,
-    genrateOtp
+    genrateOtp,
+    registerUser,
+    userLogin
 };
