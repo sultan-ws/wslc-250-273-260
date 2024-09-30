@@ -6,6 +6,8 @@ const productCategoryRouter = require('./routes/admin-panel/productCategory');
 const sizeRouter = require('./routes/admin-panel/size');
 const productRouter = require('./routes/admin-panel/product');
 const userRouter = require('./routes/webite/users/user');
+const cartRouter = require('./routes/webite/cart/cart');
+const webProductRouter = require('./routes/webite/product/product');
 
 
 
@@ -22,6 +24,8 @@ adminRouter.use('/product', productRouter);
 
 
 webRouter.use('/user', userRouter);
+webRouter.use('/cart', cartRouter);
+webRouter.use('/products', webProductRouter);
 
 allRoutes.use('/admin-panel', adminRouter);
 allRoutes.use('/frank-and-oak-services', webRouter);

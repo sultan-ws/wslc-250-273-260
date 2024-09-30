@@ -35,6 +35,8 @@ const { insertProduct, readProducts } = require("./admin-panel/product/productCo
 
 //size controller
 const { trueSizes } = require("./admin-panel/size/sizeControllers");
+const { addToCart } = require("./website/cart/cartControllers");
+const { webReadProducts } = require("./website/product/productControllers");
 
 
 // website controllers
@@ -65,5 +67,7 @@ module.exports = {
     readProducts,
     genrateOtp,
     registerUser,
-    userLogin
+    userLogin,
+    addToCart,
+    webReadProducts
 };
