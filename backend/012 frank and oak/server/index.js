@@ -11,6 +11,9 @@ app.use(express.json());
 
 app.use('/fran-and-oak-files/product-category', express.static('src/uploads/product-category'));
 app.use('/fran-and-oak-files/admin', express.static('src/uploads/admin'));
+app.use('/frankandoak-files/product', express.static('src/uploads/products/thumbnail'));
+app.use('/frankandoak-files/product', express.static('src/uploads/products/hover_thumbnail'));
+app.use('/frankandoak-files/product', express.static('src/uploads/products/gallery'));
 
 app.use('/api', allRoutes);
 

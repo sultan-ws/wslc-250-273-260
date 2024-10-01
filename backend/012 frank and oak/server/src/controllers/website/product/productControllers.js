@@ -8,8 +8,8 @@ const webReadProducts = async (req, res) => {
             .populate( {path: 'color_ids'})
             .populate({path: 'size_ids'});
 
-
-        res.status(200).json({ message: 'success', data: response });
+        const filepath = `${req.protocol}://${req.get('host')}/frankandoak-files/product/`
+        res.status(200).json({ message: 'success', data: response, filepath });
     }
     catch (error) {
         console.log(error);

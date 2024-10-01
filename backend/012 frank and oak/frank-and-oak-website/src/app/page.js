@@ -11,11 +11,19 @@ import { useEffect, useState } from "react";
 import Testimonial from "./Components/Testimonial";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
+import { useDispatch, useSelector } from "react-redux";
+import { setProducts } from "./redux/slices/productSlice";
 // import Footer from "./Components/Footer";
 
 export default function Home() {
   const [showLatestBtn, setShowLatestBtn] = useState(false);
   const [showTestimonialBtn, setShowTestimonialBtn] = useState(false);
+
+  const products = useSelector((state)=>(state.products.value));
+
+  console.log('here :', products);
+
+  const dispatch = useDispatch();
 
   const handleNext = () => {
     const box = window.document.querySelector("#box");
@@ -50,6 +58,21 @@ export default function Home() {
   };
 
 
+  const fetchProducts = ()=>{
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/products/read-products`)
+    .then((response)=>{
+      // console.log(response.data);
+      dispatch(setProducts(response.data))
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+    // dispatch(setProducts());
+  }
+
+  useEffect(()=>{fetchProducts()},[]);
+
+  
 
   return (
     <div>
@@ -108,9 +131,8 @@ export default function Home() {
           id="box"
         >
           <FaArrowLeftLong
-            className={`w-[40px] h-[40px] rounded-[50%] bg-white p-[10px] font-light absolute top-[50%] z-50 left-[25px] text-[#303640] shadow-lg cursor-pointer ${
-              showLatestBtn ? "flex" : "hidden"
-            }`}
+            className={`w-[40px] h-[40px] rounded-[50%] bg-white p-[10px] font-light absolute top-[50%] z-50 left-[25px] text-[#303640] shadow-lg cursor-pointer ${showLatestBtn ? "flex" : "hidden"
+              }`}
             onClick={handlePrev}
           />
           <FaArrowRight
@@ -139,9 +161,8 @@ export default function Home() {
           id="testimonial"
         >
           <FaArrowLeftLong
-            className={`w-[40px] h-[40px] rounded-[50%] bg-white p-[10px] font-light absolute top-[50%] z-50 left-[25px] text-[#303640] shadow-lg cursor-pointer ${
-              showTestimonialBtn ? "flex" : "hidden"
-            }`}
+            className={`w-[40px] h-[40px] rounded-[50%] bg-white p-[10px] font-light absolute top-[50%] z-50 left-[25px] text-[#303640] shadow-lg cursor-pointer ${showTestimonialBtn ? "flex" : "hidden"
+              }`}
             onClick={handleTestimonialPrevBtn}
           />
           <FaArrowRight
@@ -232,6 +253,15 @@ export default function Home() {
         </div>
       </div>
 
+      <div>
+        {
+          products.data.map((pro)=>(
+          <h1>Hello div</h1>
+        ))
+        }
+        
+      </div>
+
       <div className="w-full h-[250px] bg-black flex flex-row text-white items-center justify-center gap-[150px]">
         <span className="flex flex-col items-center justify-center font-light text-[14px] gap-[10px]">
           <CiDeliveryTruck className="text-[50px]" />
@@ -264,6 +294,8 @@ export default function Home() {
           <span>Select Klarna at checkout.</span>
         </span>
       </div>
+
+      
     </div>
   );
 }

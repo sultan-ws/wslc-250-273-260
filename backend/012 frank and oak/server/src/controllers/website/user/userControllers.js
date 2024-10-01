@@ -2,9 +2,12 @@ const nodemailer = require('nodemailer');
 const User = require('../../../models/user/user');
 const otpStore = new Map();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-const genrateOtp = async(req, res)=>{
-    try{
+const saltRounds = 10;
+
+const genrateOtp = async (req, res) => {
+    try {
         console.log(req.body);
 
         const genratedOtp = Math.floor(Math.random() * 100000);
@@ -26,70 +29,78 @@ const genrateOtp = async(req, res)=>{
             text: `Your OTP is ${genratedOtp}`
         };
 
-        transporter.sendMail(mailOption, (error, info)=>{
-            if(error) return res.status(500).json({message: 'something went wrong'});
+        transporter.sendMail(mailOption, (error, info) => {
+            if (error) return res.status(500).json({ message: 'something went wrong' });
 
-            res.status(200).json({message: 'otp has been sent on email'});
+            res.status(200).json({ message: 'otp has been sent on email' });
         })
     }
-    catch(error){
-        res.status(500).json({message: 'internal server error'});
+    catch (error) {
+        res.status(500).json({ message: 'internal server error' });
         console.log(error);
     }
 };
 
-const registerUser = async (req, res)=>{
-    try{
-        const {email, password, f_name, l_name, otp} = req.body;
+const registerUser = async (req, res) => {
+    try {
+        const { email, password, f_name, l_name, otp } = req.body;
 
-        if(Number(otp) !== otpStore.get(email)) return res.status(401).json({message: 'please provide a valid otp'});
+        bcrypt.hash(password, saltRounds, async (error, hashedPassword) => {
+            console.log(hashedPassword);
+            if (Number(otp) !== otpStore.get(email)) return res.status(401).json({ message: 'please provide a valid otp' });
 
-        const dataToSave = new User({
-            first_name:f_name,
-            last_name:l_name,
-            password,
-            email
-        });
+            const dataToSave = new User({
+                first_name: f_name,
+                last_name: l_name,
+                password:hashedPassword,
+                email
+            });
 
-        
 
-        const response = await dataToSave.save();
 
-        const dataWithoutPasswrod = response._doc;
+            const response = await dataToSave.save();
 
-        jwt.sign(dataWithoutPasswrod, process.env.JWT_KEY, {expiresIn: 60 * 60 * 24 * 7}, (error, token)=>{
-            if(error) return res.status(500).json({message: 'something went wrong'});
-            
-            res.status(200).json({message: 'success', data: response, auth: token});
-        });
+            const dataWithoutPasswrod = response._doc;
+
+            jwt.sign(dataWithoutPasswrod, process.env.JWT_KEY, { expiresIn: 60 * 60 * 24 * 7 }, (error, token) => {
+                if (error) return res.status(500).json({ message: 'something went wrong' });
+
+                res.status(200).json({ message: 'success', data: response, auth: token });
+            });
+        })
+
+
 
     }
-    catch(error){
+    catch (error) {
         console.log(errro);
-        res.status(500).json({message: 'internal server error'});
+        res.status(500).json({ message: 'internal server error' });
     }
 }
 
-const userLogin = async (req, res) =>{
-    try{
+const userLogin = async (req, res) => {
+    try {
         console.log(req.body);
 
-        const ifAdmin = await User.findOne({email: req.body.email});
+        const ifAdmin = await User.findOne({ email: req.body.email });
 
-        if(!ifAdmin) return res.status(404).json({message : 'please provide a valid email'});
+        if (!ifAdmin) return res.status(404).json({ message: 'please provide a valid email' });
 
-        if(ifAdmin.password !== req.body.password) return res.status(401).json({message : 'please provide a valid password'});
 
-        jwt.sign(ifAdmin._doc , process.env.JWT_KEY, {expiresIn: 60 * 60 * 24 * 7}, (error, token)=>{
+        const isMatch = await bcrypt.compare(req.body.password, ifAdmin.password);
+
+        if (!isMatch) return res.status(401).json({ message: 'please provide a valid password' });
+
+        jwt.sign(ifAdmin._doc, process.env.JWT_KEY, { expiresIn: 60 * 60 * 24 * 7 }, (error, token) => {
             console.log(error)
-            if(error) return res.status(500).json({message: 'something went wrong'});
-            
-            res.status(200).json({message: 'success', data: ifAdmin, auth: token});
+            if (error) return res.status(500).json({ message: 'something went wrong' });
+
+            res.status(200).json({ message: 'success', data: ifAdmin, auth: token });
         });
     }
-    catch(error){
+    catch (error) {
         console.log(error);
-        res.status(500).json({message: 'internal server error'});
+        res.status(500).json({ message: 'internal server error' });
     }
 };
 
