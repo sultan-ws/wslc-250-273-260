@@ -23,7 +23,8 @@ const cartSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['purchased', 'not purchased']
+        enum:['purchased', 'not purchased'],
+        default: 'not purchased'
     },
     created_at:Date,
     updated_at:Date

@@ -18,12 +18,21 @@ import { setProducts } from "./redux/slices/productSlice";
 export default function Home() {
   const [showLatestBtn, setShowLatestBtn] = useState(false);
   const [showTestimonialBtn, setShowTestimonialBtn] = useState(false);
+  const [ productList, setProductList ] = useState([]);
+  const [ urlString, setUrlString ] = useState('');
 
   const products = useSelector((state)=>(state.products.value));
 
-  console.log('here :', products);
 
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    // setProductList(products.data);
+    // setUrlString(products.filepath)
+
+    console.log(products.data);
+
+  },[products]);
 
   const handleNext = () => {
     const box = window.document.querySelector("#box");
@@ -63,6 +72,8 @@ export default function Home() {
     .then((response)=>{
       // console.log(response.data);
       dispatch(setProducts(response.data))
+      setProductList(response.data.data);
+      setUrlString(response.data.filepath);
     })
     .catch((error)=>{
       console.log(error);
@@ -72,7 +83,25 @@ export default function Home() {
 
   useEffect(()=>{fetchProducts()},[]);
 
-  
+  const handleAddToCart = (_id)=>{
+
+
+    const data = {
+      user:'66f6c7f4b0cc6b462f56d9e3',
+      product: _id,
+      color:'66e1b0407d0c1a19914eec6e',
+      size:'66f2676a12b40eb858fd810b',
+      quantity:1
+    }
+
+    axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/add-to-cart`, data)
+    .then((response)=>{
+      console.log(response);
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
 
   return (
     <div>
@@ -253,11 +282,19 @@ export default function Home() {
         </div>
       </div>
 
-      <div>
+      <div className="py-10 px-8 grid grid-cols-4 gap-4">
+        
         {
-          products.data.map((pro)=>(
-          <h1>Hello div</h1>
-        ))
+          productList.map((product)=>(
+            <div className="border rounded-md">
+              <div>
+                <img className="w-full" src={urlString + product.thumbnail}/>
+              </div>
+              <div className="p-4">
+                <button onClick={()=>{handleAddToCart(product._id)}} className="px-6 py-4 bg-cyan-400 rounded">Add to cart</button>
+              </div>
+            </div>
+          ))
         }
         
       </div>
