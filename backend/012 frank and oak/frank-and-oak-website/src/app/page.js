@@ -103,6 +103,41 @@ export default function Home() {
     })
   };
 
+  const pay = async()=>{
+    const data = [
+      {
+        product:{
+          name:'Product 01',
+          price: 1200
+        },
+        color:'red',
+        size: 'xl',
+        user:'sultan',
+        quentity:4
+      },
+      {
+        product:{
+          name:'Product 02',
+          price: 750
+        },
+        color:'red',
+        size: 'xl',
+        user:'sultan',
+        quentity:6
+      }
+    ];
+
+    const stripe =await loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/payment/pay`, {data});
+
+    stripe.redirectToCheckout({
+      sessionId: response.data.seesion_id
+    });
+    console.log(response);
+    
+  };
+
   return (
     <div>
       {/* <span className="text-black mt-[60px] text-[30px] bg-red-600 block">
@@ -152,6 +187,12 @@ export default function Home() {
           </span>
         </div>
       </div>
+
+        <div className='py-12 px-8'>
+          <button onClick={pay} className='py-4 px-6 bg-blue-400'>
+            buy now
+          </button>
+        </div>
       <div className="w-full h-[100vh] py-[30px] box-border relative">
         <span className="m-[30px] text-[30px]">This Just In</span>
 

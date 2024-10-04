@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
-    "@stripe/stripe-js": "^4.5.0",
+    "@stripe/stripe-js": "^4.6.0",
     "axios": "^1.7.7",
     "frankandoak": "file:",
     "js-cookie": "^3.0.5",
