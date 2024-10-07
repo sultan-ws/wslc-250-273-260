@@ -13,6 +13,7 @@ import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "./redux/slices/productSlice";
+import { loadData } from "./redux/slices/cartSlice";
 // import Footer from "./Components/Footer";
 
 export default function Home() {
@@ -71,7 +72,7 @@ export default function Home() {
     axios.get(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/products/read-products`)
     .then((response)=>{
       // console.log(response.data);
-      dispatch(setProducts(response.data))
+      dispatch(setProducts(response.data));
       setProductList(response.data.data);
       setUrlString(response.data.filepath);
     })
@@ -81,7 +82,19 @@ export default function Home() {
     // dispatch(setProducts());
   }
 
-  useEffect(()=>{fetchProducts()},[]);
+  const readCart = ()=>{
+    const id = '66f6c7f4b0cc6b462f56d9e3';
+    axios.get(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/read-cart/${id}`)
+    .then((response)=>{
+      dispatch(loadData(response.data.data));
+      console.log('api response:', response.data.data);
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
+
+  useEffect(()=>{fetchProducts(), readCart()},[]);
 
   const handleAddToCart = (_id)=>{
 
@@ -328,8 +341,8 @@ export default function Home() {
         {
           productList.map((product)=>(
             <div className="border rounded-md">
-              <div>
-                <img className="w-full" src={urlString + product.thumbnail}/>
+              <div className='h-[300px]'>
+                <img className="h-full" src={urlString + product.thumbnail}/>
               </div>
               <div className="p-4">
                 <button onClick={()=>{handleAddToCart(product._id)}} className="px-6 py-4 bg-cyan-400 rounded">Add to cart</button>

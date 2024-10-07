@@ -34,7 +34,7 @@ const {
 const { insertProduct, readProducts } = require("./admin-panel/product/productControllers");
 
 //size controller
-const { trueSizes } = require("./admin-panel/size/sizeControllers");
+const { trueSizes, addSize } = require("./admin-panel/size/sizeControllers");
 const { addToCart } = require("./website/cart/cartControllers");
 const { webReadProducts } = require("./website/product/productControllers");
 
@@ -69,5 +69,6 @@ module.exports = {
     registerUser,
     userLogin,
     addToCart,
-    webReadProducts
+    webReadProducts,
+    addSize
 };

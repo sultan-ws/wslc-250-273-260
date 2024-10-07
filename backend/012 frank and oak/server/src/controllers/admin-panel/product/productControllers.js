@@ -35,8 +35,8 @@ const readProducts = async (req, res) => {
         const response = await Product.find()
             .populate('parent_category')
             .populate('product_category')
-            .populate( {path: 'color_ids'})
-            .populate({path: 'size_ids'});
+            .populate( 'color_ids')
+            .populate('size_ids');
 
 
         res.status(200).json({ message: 'success', data: response });

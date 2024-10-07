@@ -3,15 +3,15 @@ const path = require('path');
 
 const multerStorage = (foldername)=> multer.diskStorage({
     destination: (req, file, cb) => {
+        cb(null, `src/uploads/${foldername}`);
 
-
-        if(foldername === 'products'){
-            cb(null, `src/uploads/${foldername}/${file.fieldname}`);
-        }
-        else{
-            cb(null, `src/uploads/${foldername}`)
-        }
-        console.log(file)
+        // if(foldername === 'products'){
+        //     cb(null, `src/uploads/${foldername}`);
+        // }
+        // else{
+        //     cb(null, `src/uploads/${foldername}`)
+        // }
+        // console.log(file)
         
     },
     filename: (req, file, cb) => {

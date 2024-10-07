@@ -1,10 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { IoLockClosedOutline } from "react-icons/io5";
 import PopularOffcanvasCards from "./PopularOffcanvasCards";
+import { useSelector } from "react-redux";
+// import { useEffect } from "react/cjs/react.production.min";
 
 const Offcanvas = ({ close }) => {
   const [controlBtn, setControlBtn] = useState(false);
+  const [cartProducts, setCartProduct] = useState([]);
+  const [filePath, setFilePath] = useState('');
+  const [cartDetails, setCartDetails] = useState({totalQ:0,totalPrice: 0});
+
+  const cartData = useSelector((state)=>(state.cart.value));
+  const products = useSelector((state)=>(state.products.value));
+
+  console.log('abc:', products);
+
+  useEffect(()=>{
+    setCartProduct(cartData);
+    setFilePath(products.filepath);
+  },[cartData])
+  console.log('cartdata', cartData);
+
+  useEffect(()=>{
+    let totalItem = 0;
+    let totalprice = 0;
+    cartProducts.forEach((cartItem)=>{
+      totalItem += cartItem.quantity
+
+      totalprice += (cartItem.quantity * cartItem.product.price);
+    });
+
+    console.log('totalprice',totalprice);
+    setCartDetails({totalQ:totalItem,totalPrice:totalprice});
+    // setCartDetails({totalPrice:totalprice, totalQ:totalItem});
+
+  },[cartProducts]);
 
   const handlePrevBtn = () => {
     const box = window.document.querySelector("#box");
@@ -83,16 +114,39 @@ const Offcanvas = ({ close }) => {
           />
         </div>
       </div>
+          
+      <div>
+      {
+        cartProducts.map((product)=>(
+          <div className='grid grid-cols-[2fr_6fr_2fr_2fr]'>
+            <div>
+              <img className='w-full' src={filePath + product.product.thumbnail}/>
+            </div>
+            <div>
+              <h2 className='text-[#303640]'>{product.product.name}</h2>
+            </div>
 
+            <div>
+              <h2 className='text-[#303640]'> <span>₹</span> {product.product.price}</h2>
+            </div>
+            <div>
+              {
+                product.quantity
+              }
+            </div>
+          </div>
+        ))
+      }
+      </div>
       <div className="w-[90%] absolute bottom-[10px] left-[50%] translate-x-[-50%] ">
         <div className="w-full bg-[#f9f9f9] h-[40px] flex items-center justify-between mb-[10px] px-[10px]">
           <span>
-            Subtotal <span className="text-[#7c7c7c]">(0 items)</span>
+            Subtotal <span className="text-[#7c7c7c]">({cartDetails.totalQ} items)</span>
           </span>
-          <span>$0.00</span>
+          <span>₹ {cartDetails.totalPrice}</span>
         </div>
         <button className="flex gap-[20px] items-center justify-center text-white text-[20px] w-full h-[60px] cursor-pointer bg-[#7c7c7c] ">
-          <span>Secure Checkout</span>
+          <span>Secure Checkout AAAA</span>
           <IoLockClosedOutline className="inline-block" />
         </button>
       </div>
