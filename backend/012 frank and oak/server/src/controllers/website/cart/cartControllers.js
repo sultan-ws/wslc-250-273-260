@@ -30,7 +30,37 @@ const readCart = async(req, res)=>{
     }
 }
 
+const deleteProduct = async(req, res)=>{
+    try{
+        const data = await Cart.findByIdAndDelete(req.params.id);
+        res.status(200).json({message: 'success', data});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+}
+
+const quentityUpdate = async(req, res)=>{
+    try{
+        const data = await Cart.updateOne(
+            req.params,
+            {
+                $set:{quantity: req.body.newquentity}
+            }
+        );
+
+        res.status(200).json({message: 'success', data});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: 'internal server error'});
+    }
+}
+
 module.exports = {
     addToCart,
-    readCart
+    readCart,
+    deleteProduct,
+    quentityUpdate
 }

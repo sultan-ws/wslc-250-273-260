@@ -21,6 +21,7 @@ export default function Home() {
   const [showTestimonialBtn, setShowTestimonialBtn] = useState(false);
   const [ productList, setProductList ] = useState([]);
   const [ urlString, setUrlString ] = useState('');
+  const [userPref, setUserPref] = useState({});
 
   const products = useSelector((state)=>(state.products.value));
 
@@ -31,7 +32,7 @@ export default function Home() {
     // setProductList(products.data);
     // setUrlString(products.filepath)
 
-    console.log(products.data);
+    // console.log(products.data);
 
   },[products]);
 
@@ -52,7 +53,7 @@ export default function Home() {
     const testimonialContainer = window.document.querySelector("#testimonial");
     const testimonialWidth = testimonialContainer.clientWidth;
     testimonialContainer.scrollLeft += testimonialWidth;
-    console.log(testimonialContainer.scrollLeft);
+    // console.log(testimonialContainer.scrollLeft);
     setShowTestimonialBtn(true);
   };
 
@@ -71,7 +72,7 @@ export default function Home() {
   const fetchProducts = ()=>{
     axios.get(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/products/read-products`)
     .then((response)=>{
-      // console.log(response.data);
+      console.log(response.data);
       dispatch(setProducts(response.data));
       setProductList(response.data.data);
       setUrlString(response.data.filepath);
@@ -87,10 +88,10 @@ export default function Home() {
     axios.get(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/read-cart/${id}`)
     .then((response)=>{
       dispatch(loadData(response.data.data));
-      console.log('api response:', response.data.data);
+      // console.log('api response:', response.data.data);
     })
     .catch((error)=>{
-      console.log(error);
+      // console.log(error);
     })
   };
 
@@ -102,14 +103,15 @@ export default function Home() {
     const data = {
       user:'66f6c7f4b0cc6b462f56d9e3',
       product: _id,
-      color:'66e1b0407d0c1a19914eec6e',
-      size:'66f2676a12b40eb858fd810b',
+      color:userPref.color,
+      size:userPref.size,
       quantity:1
     }
 
     axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/add-to-cart`, data)
     .then((response)=>{
       console.log(response);
+      readCart();
     })
     .catch((error)=>{
       console.log(error);
@@ -147,7 +149,7 @@ export default function Home() {
     stripe.redirectToCheckout({
       sessionId: response.data.seesion_id
     });
-    console.log(response);
+    // console.log(response);
     
   };
 
@@ -344,9 +346,30 @@ export default function Home() {
               <div className='h-[300px]'>
                 <img className="h-full" src={urlString + product.thumbnail}/>
               </div>
-              <div className="p-4">
-                <button onClick={()=>{handleAddToCart(product._id)}} className="px-6 py-4 bg-cyan-400 rounded">Add to cart</button>
+              <form method='post'>
+              <div>
+                <select onChange={(e)=>{setUserPref({...userPref, size: e.target.value})}}>
+                  {
+                    product.sizes.map((size)=>(
+                      <option value={size._id}>{size.size}</option>
+                    ))
+                    
+                  }
+                </select>
+
+                <select onChange={(e)=>{setUserPref({...userPref, color: e.target.value})}}>
+                  {
+                    product.colors.map((color)=>(
+                      <option value={color._id}>{color.name}</option>
+                    ))
+                    
+                  }
+                </select>
               </div>
+              <div className="p-4">
+                <button type='button' onClick={()=>{handleAddToCart(product._id)}} className="px-6 py-4 bg-cyan-400 rounded">Add to cart</button>
+              </div>
+              </form>
             </div>
           ))
         }

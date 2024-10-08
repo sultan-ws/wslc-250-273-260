@@ -2,11 +2,13 @@ const Product = require("../../../models/product/product");
 
 const webReadProducts = async (req, res) => {
     try {
-        const response = await Product.find({status:true})
+        const response = await Product.find()
             .populate('parent_category')
             .populate('product_category')
-            .populate( {path: 'color_ids'})
-            .populate({path: 'size_ids'});
+            .populate('sizes')
+            .populate('colors');
+
+        console.log(response);
 
         const filepath = `${req.protocol}://${req.get('host')}/frankandoak-files/product/`
         res.status(200).json({ message: 'success', data: response, filepath });

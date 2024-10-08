@@ -2,40 +2,44 @@ import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { IoLockClosedOutline } from "react-icons/io5";
 import PopularOffcanvasCards from "./PopularOffcanvasCards";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { deleteProductFromCart } from "../redux/slices/cartSlice";
 // import { useEffect } from "react/cjs/react.production.min";
 
 const Offcanvas = ({ close }) => {
   const [controlBtn, setControlBtn] = useState(false);
   const [cartProducts, setCartProduct] = useState([]);
   const [filePath, setFilePath] = useState('');
-  const [cartDetails, setCartDetails] = useState({totalQ:0,totalPrice: 0});
+  const [cartDetails, setCartDetails] = useState({ totalQ: 0, totalPrice: 0 });
 
-  const cartData = useSelector((state)=>(state.cart.value));
-  const products = useSelector((state)=>(state.products.value));
+  const cartData = useSelector((state) => (state.cart.value));
+  const products = useSelector((state) => (state.products.value));
+
+  const dispatch = useDispatch();
 
   console.log('abc:', products);
 
-  useEffect(()=>{
+  useEffect(() => {
     setCartProduct(cartData);
     setFilePath(products.filepath);
-  },[cartData])
+  }, [cartData])
   console.log('cartdata', cartData);
 
-  useEffect(()=>{
+  useEffect(() => {
     let totalItem = 0;
     let totalprice = 0;
-    cartProducts.forEach((cartItem)=>{
+    cartProducts.forEach((cartItem) => {
       totalItem += cartItem.quantity
 
       totalprice += (cartItem.quantity * cartItem.product.price);
     });
 
-    console.log('totalprice',totalprice);
-    setCartDetails({totalQ:totalItem,totalPrice:totalprice});
+    console.log('totalprice', totalprice);
+    setCartDetails({ totalQ: totalItem, totalPrice: totalprice });
     // setCartDetails({totalPrice:totalprice, totalQ:totalItem});
 
-  },[cartProducts]);
+  }, [cartProducts]);
 
   const handlePrevBtn = () => {
     const box = window.document.querySelector("#box");
@@ -50,6 +54,29 @@ const Offcanvas = ({ close }) => {
     setControlBtn(true);
   };
 
+  const handleDeletedProduct = async(e)=>{
+    console.log(e.target.value);
+
+   
+
+    axios.delete(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/delete-product/${e.target.value}`)
+    .then((response)=>{
+      console.log(response);
+      dispatch(deleteProductFromCart(e.target.value));
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
+
+  const hanldeUpdateQuentity = async (e)=>{
+    console.log(e.target.value, e.target.textContent);
+
+    const dataFound = cartProducts.filter((cartItem)=> cartItem._id === e.target.value);
+
+    console.log(dataFound[0].quantity);
+  }
+
   return (
     <div className="w-[600px] h-[100vh] absolute right-0 top-0 bg-white">
       <span className="block h-[40px] px-[10px] bg-[#f9f9f9]">
@@ -63,7 +90,7 @@ const Offcanvas = ({ close }) => {
         Free shipping on orders $99+ and free returns
       </span>
 
-      <div className="w-full my-[50px] relative">
+      {/* <div className="w-full my-[50px] relative">
         <span className="block bg-[#f9f9f9] h-[40px] p-[8px_30px]">
           Most popular right now
         </span>
@@ -113,30 +140,35 @@ const Offcanvas = ({ close }) => {
             sizes={["XXS", "XS", "S", "M", "L", "XL"]}
           />
         </div>
-      </div>
-          
-      <div>
-      {
-        cartProducts.map((product)=>(
-          <div className='grid grid-cols-[2fr_6fr_2fr_2fr]'>
-            <div>
-              <img className='w-full' src={filePath + product.product.thumbnail}/>
-            </div>
-            <div>
-              <h2 className='text-[#303640]'>{product.product.name}</h2>
-            </div>
+      </div> */}
 
-            <div>
-              <h2 className='text-[#303640]'> <span>₹</span> {product.product.price}</h2>
+      <div>
+        {
+          cartProducts.map((product) => (
+            <div className='grid grid-cols-[2fr_6fr_2fr_2fr]'>
+              <div>
+                <img className='w-full' src={filePath + product.product.thumbnail} />
+              </div>
+              <div>
+                <h2 className='text-[#303640]'>{product.product.name}</h2>
+              </div>
+
+              <div>
+                <h2 className='text-[#303640]'> <span>₹</span> {product.product.price}</h2>
+              </div>
+              <div>
+                <button value={product._id} disabled={product.quantity === 1} className='border p-1'>-</button>
+                <span className='mx-2'>
+                {
+                  product.quantity
+                }
+                </span>
+                <button value={product._id} onClick={hanldeUpdateQuentity} className='border p-1'>+</button>
+                <button value={product._id} onClick={handleDeletedProduct} className='border p-1'>Delete</button>
+              </div>
             </div>
-            <div>
-              {
-                product.quantity
-              }
-            </div>
-          </div>
-        ))
-      }
+          ))
+        }
       </div>
       <div className="w-[90%] absolute bottom-[10px] left-[50%] translate-x-[-50%] ">
         <div className="w-full bg-[#f9f9f9] h-[40px] flex items-center justify-between mb-[10px] px-[10px]">

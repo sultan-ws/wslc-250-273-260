@@ -78,7 +78,7 @@ const AddProduct = () => {
   useEffect(()=>{
     axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/color/active-colors`)
     .then((response)=>{
-      console.log(response.data.data);
+      console.log("colors:",response.data.data);
       setColors(response.data.data);
     })
     .catch((error)=>{
@@ -90,7 +90,7 @@ const AddProduct = () => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/admin-panel/size/active-sizes`)
     .then((response)=>{
       if(response.status === 200) {
-        console.log(response.data.data)
+        console.log('sizes:',response.data.data)
         setSizes(response.data.data);        
       }
     })
@@ -102,7 +102,8 @@ const AddProduct = () => {
   const handleInsertProduct = (e)=>{
     e.preventDefault();
 
-    // console.log(checkedSizes, checkedSizes);
+    console.log(checkedSizes, checkedColors);
+    // return;
 
     if(e.target.parent_category.value === 'false') return alert('Please select parent category');
 
@@ -302,7 +303,7 @@ const AddProduct = () => {
               {
                 colors.map((color, index)=>(
                   <li key={index}>
-                    <input type="checkbox" value={color._id} onClick={handleCheckSize}/>
+                    <input type="checkbox" value={color._id} onClick={handleCheckColor}/>
                     <span className="mx-10 ">{color.name}</span>
                     <span className={`px-6 border`} style={{
                       backgroundColor: color.code
@@ -320,7 +321,7 @@ const AddProduct = () => {
               {
                 sizes.map((size, index)=>(
                   <li key={index}>
-                    <input type="checkbox" value={size._id} onClick={handleCheckColor} />
+                    <input type="checkbox" value={size._id} onClick={handleCheckSize} />
                     <span className="mx-10 ">{size.name}</span>
                   </li>
                 ))

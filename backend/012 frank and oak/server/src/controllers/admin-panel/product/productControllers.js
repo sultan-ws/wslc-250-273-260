@@ -4,8 +4,8 @@ const insertProduct = async (req, res) => {
     try {
         const data = req.body;
 
-        data.color_ids = JSON.parse(data.colors);
-        data.size_ids = JSON.parse(data.sizes);
+        data.colors = JSON.parse(data.colors);
+        data.sizes = JSON.parse(data.sizes);
 
         if (req.files) {
             if (req.files.thumbnail) data.thumbnail = req.files.thumbnail[0].filename;
@@ -22,7 +22,7 @@ const insertProduct = async (req, res) => {
 
         const response = await dataToSave.save();
 
-        res.status(200).json({ message: 'success', data: response });
+        res.status(200).json({ message: 'success', data: 'response' });
     }
     catch (error) {
         console.log(error);
