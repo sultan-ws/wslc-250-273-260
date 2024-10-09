@@ -4,7 +4,8 @@ import { IoLockClosedOutline } from "react-icons/io5";
 import PopularOffcanvasCards from "./PopularOffcanvasCards";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { deleteProductFromCart } from "../redux/slices/cartSlice";
+import { deleteProductFromCart, updateProductQuentity } from "../redux/slices/cartSlice";
+import { loadStripe } from "@stripe/stripe-js";
 // import { useEffect } from "react/cjs/react.production.min";
 
 const Offcanvas = ({ close }) => {
@@ -74,8 +75,46 @@ const Offcanvas = ({ close }) => {
 
     const dataFound = cartProducts.filter((cartItem)=> cartItem._id === e.target.value);
 
-    console.log(dataFound[0].quantity);
-  }
+    let newquentity;
+    if(e.target.textContent === '+') newquentity = dataFound[0].quantity + 1;
+    if(e.target.textContent === '-') newquentity = dataFound[0].quantity - 1;
+
+
+    const obj = dataFound[0];
+    const newObj = {...obj, quantity:newquentity};
+
+    axios.put(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/cart/update-quentity/${e.target.value}`,{newquentity})
+    .then((response)=>{
+      console.log(response);
+
+      const index = cartProducts.findIndex((item)=> item._id === e.target.value);
+
+      const newArr = [...cartProducts]
+      newArr.splice(index, 1, newObj)
+
+      console.log(newArr);
+      dispatch(updateProductQuentity(newArr));
+     
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
+  };
+
+  const hanldePurchase = async()=>{
+
+    const stripe =await loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/payment/pay`, {cartProducts});
+
+    console.log(response);
+    // stripe.redirectToCheckout({
+    //   sessionId: response.data.seesion_id
+    // });
+    // console.log(response);
+    
+  };
+
 
   return (
     <div className="w-[600px] h-[100vh] absolute right-0 top-0 bg-white">
@@ -157,7 +196,7 @@ const Offcanvas = ({ close }) => {
                 <h2 className='text-[#303640]'> <span>₹</span> {product.product.price}</h2>
               </div>
               <div>
-                <button value={product._id} disabled={product.quantity === 1} className='border p-1'>-</button>
+                <button value={product._id} onClick={hanldeUpdateQuentity} disabled={product.quantity === 1} className='border p-1'>-</button>
                 <span className='mx-2'>
                 {
                   product.quantity
@@ -177,8 +216,8 @@ const Offcanvas = ({ close }) => {
           </span>
           <span>₹ {cartDetails.totalPrice}</span>
         </div>
-        <button className="flex gap-[20px] items-center justify-center text-white text-[20px] w-full h-[60px] cursor-pointer bg-[#7c7c7c] ">
-          <span>Secure Checkout AAAA</span>
+        <button onClick={hanldePurchase} className="flex gap-[20px] items-center justify-center text-white text-[20px] w-full h-[60px] cursor-pointer bg-[#7c7c7c] ">
+          <span>Secure Checkout</span>
           <IoLockClosedOutline className="inline-block" />
         </button>
       </div>
