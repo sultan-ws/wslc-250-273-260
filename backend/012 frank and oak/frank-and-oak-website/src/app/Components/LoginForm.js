@@ -72,6 +72,7 @@ const LoginForm = ({ close }) => {
     axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/user/register`, formData)
     .then((response)=>{
       console.log(response.data);
+      Cookie.set('user_200', JSON.stringify(response.data));
     })
     .catch((error)=>{
       console.log(error);

@@ -7,6 +7,7 @@ import axios from "axios";
 import { deleteProductFromCart, updateProductQuentity } from "../redux/slices/cartSlice";
 import { loadStripe } from "@stripe/stripe-js";
 // import { useEffect } from "react/cjs/react.production.min";
+import Cookie from 'js-cookie';
 
 const Offcanvas = ({ close }) => {
   const [controlBtn, setControlBtn] = useState(false);
@@ -102,16 +103,25 @@ const Offcanvas = ({ close }) => {
   };
 
   const hanldePurchase = async()=>{
+   const user =  JSON.parse(Cookie.get('user_200'));
+
+   console.log(user.auth);
 
     const stripe =await loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
 
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/payment/pay`, {cartProducts});
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}/frank-and-oak-services/payment/pay`, {cartProducts}, {
+      headers: {
+        // 'Content-Type': 'multipart/formdata'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.auth}`
+      }
+    });
 
     console.log(response);
-    // stripe.redirectToCheckout({
-    //   sessionId: response.data.seesion_id
-    // });
-    // console.log(response);
+    stripe.redirectToCheckout({
+      sessionId: response.data.seesion_id
+    });
+    console.log(response);
     
   };
 
